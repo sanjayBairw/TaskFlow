@@ -3,6 +3,7 @@ export * from './common/CustomInput';
 export * from './common/Card';
 export * from './common/Badge';
 export * from './common/Header';
+export * from './common/FloatingAIButton';
 export * from './task/PriorityBadge';
 export * from './task/CategoryBadge';
 export * from './task/TaskCard';

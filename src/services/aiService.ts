@@ -19,10 +19,15 @@ export class AIService {
       conversationId,
     };
 
-    const res = await ApiService.post<{ data: AICommandResponseData } | AICommandResponseData>('/ai/command', payload);
-    if ('data' in res && res.data) {
-      return res.data;
+    const res = await ApiService.post<any>('/ai/command', payload);
+
+    if (res && typeof res === 'object') {
+      if ('data' in res && res.data && typeof res.data === 'object' && 'intent' in res.data) {
+        return res.data as AICommandResponseData;
+      }
+      return res as AICommandResponseData;
     }
-    return res as AICommandResponseData;
+
+    throw new Error('Invalid response structure received from TaskFlow AI server');
   }
 }

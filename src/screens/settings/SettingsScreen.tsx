@@ -56,7 +56,26 @@ export const SettingsScreen: React.FC<SettingsTabNavProps> = ({ navigation }) =>
 
   return (
     <View style={styles.container}>
-      <Header title="Settings" subtitle="Notifications, Reschedule & Preferences" />
+      <Header
+        title="Settings"
+        subtitle="Notifications, Reschedule & Preferences"
+        rightAction={
+          <View style={{ flexDirection: 'row', gap: 6 }}>
+            <TouchableOpacity
+              style={{ backgroundColor: '#F1F5F9', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, borderWidth: 1, borderColor: '#E2E8F0' }}
+              onPress={() => navigation.navigate('Home')}
+            >
+              <Text style={{ fontSize: 12, fontWeight: '600', color: theme.colors.textPrimary }}>🏠 Home</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{ backgroundColor: '#F1F5F9', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, borderWidth: 1, borderColor: '#E2E8F0' }}
+              onPress={() => navigation.navigate('Tasks')}
+            >
+              <Text style={{ fontSize: 12, fontWeight: '600', color: theme.colors.textPrimary }}>📋 Tasks</Text>
+            </TouchableOpacity>
+          </View>
+        }
+      />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Section 1: Notifications */}

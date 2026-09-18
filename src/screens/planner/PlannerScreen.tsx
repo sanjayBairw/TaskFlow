@@ -6,27 +6,19 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  FlatList,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { Header } from '../../components';
+import { Header, FloatingAIButton } from '../../components';
 import { theme } from '../../theme';
 import { TaskService } from '../../services/taskService';
 import { Task } from '../../models';
 import { PlannerTabNavProps } from '../../navigation/types';
+import { useScrollFAB } from '../../hooks/useScrollFAB';
 
 type PlannerViewMode = 'Day' | 'Week' | 'AI Plans';
 
-interface AIPlanItem {
-  id: string;
-  title: string;
-  durationDays: number;
-  overview: string;
-  sectionsCount: number;
-  createdAt: string;
-}
-
 export const PlannerScreen: React.FC<PlannerTabNavProps> = ({ navigation }) => {
+  const { isFabVisible, handleScroll } = useScrollFAB();
   const [viewMode, setViewMode] = useState<PlannerViewMode>('Day');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -70,12 +62,27 @@ export const PlannerScreen: React.FC<PlannerTabNavProps> = ({ navigation }) => {
     return t.dateTime.split('T')[0] === selectedDateStr;
   });
 
-  // Mock AI plans derived from AI generated tasks
   const aiGeneratedTasks = tasks.filter((t) => t.aiGenerated);
 
   return (
     <View style={styles.container}>
-      <Header title="Schedule Planner" subtitle="Day, Week & AI Multi-Day Roadmaps" />
+      <Header
+        title="Schedule Planner"
+        subtitle="Day, Week & AI Multi-Day Roadmaps"
+        rightAction={
+          <View style={styles.navRow}>
+            <TouchableOpacity style={styles.navChip} onPress={() => navigation.navigate('Home')}>
+              <Text style={styles.navChipText}>🏠 Home</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.navChip} onPress={() => navigation.navigate('Tasks')}>
+              <Text style={styles.navChipText}>📋 Tasks</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.navChip} onPress={() => navigation.navigate('Settings')}>
+              <Text style={styles.navChipText}>⚙️</Text>
+            </TouchableOpacity>
+          </View>
+        }
+      />
 
       {/* Mode Selector Tabs */}
       <View style={styles.tabContainer}>
@@ -101,7 +108,12 @@ export const PlannerScreen: React.FC<PlannerTabNavProps> = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 100 }]}
+        showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+      >
         {/* DAY VIEW */}
         {viewMode === 'Day' && (
           <View>
@@ -110,7 +122,6 @@ export const PlannerScreen: React.FC<PlannerTabNavProps> = ({ navigation }) => {
               {weekDays.map((d) => {
                 const dateStr = d.toISOString().split('T')[0];
                 const isSelected = dateStr === selectedDateStr;
-                const isToday = dateStr === new Date().toISOString().split('T')[0];
                 const taskCount = tasks.filter((t) => t.dateTime && t.dateTime.split('T')[0] === dateStr).length;
 
                 return (
@@ -276,6 +287,12 @@ export const PlannerScreen: React.FC<PlannerTabNavProps> = ({ navigation }) => {
           </View>
         )}
       </ScrollView>
+
+      {/* Floating AI Button */}
+      <FloatingAIButton
+        visible={isFabVisible}
+        onPress={() => navigation.navigate('AIAssistant')}
+      />
     </View>
   );
 };
@@ -284,6 +301,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
+  },
+  navRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  navChip: {
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  navChipText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
   },
   tabContainer: {
     flexDirection: 'row',

@@ -7,17 +7,18 @@ import {
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
-  FlatList,
   Alert,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { Header } from '../../components';
+import { Header, FloatingAIButton } from '../../components';
 import { theme } from '../../theme';
 import { TaskService } from '../../services/taskService';
 import { Task, TaskStatus } from '../../models';
 import { HomeTabNavProps } from '../../navigation/types';
+import { useScrollFAB } from '../../hooks/useScrollFAB';
 
 export const HomeScreen: React.FC<HomeTabNavProps> = ({ navigation }) => {
+  const { isFabVisible, handleScroll } = useScrollFAB();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [aiPrompt, setAiPrompt] = useState('');
@@ -75,9 +76,30 @@ export const HomeScreen: React.FC<HomeTabNavProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Header title="TaskFlow Home" subtitle="Personal AI Planning Assistant" />
+      <Header
+        title="TaskFlow Home"
+        subtitle="Personal AI Planning Assistant"
+        rightAction={
+          <View style={styles.navRow}>
+            <TouchableOpacity style={styles.navChip} onPress={() => navigation.navigate('Tasks')}>
+              <Text style={styles.navChipText}>📋 Tasks</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.navChip} onPress={() => navigation.navigate('Planner')}>
+              <Text style={styles.navChipText}>📅 Planner</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.navChip} onPress={() => navigation.navigate('Settings')}>
+              <Text style={styles.navChipText}>⚙️</Text>
+            </TouchableOpacity>
+          </View>
+        }
+      />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 100 }]}
+        showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+      >
         {/* Progress Overview Card */}
         <View style={styles.progressCard}>
           <View style={styles.progressHeader}>
@@ -217,6 +239,12 @@ export const HomeScreen: React.FC<HomeTabNavProps> = ({ navigation }) => {
           })
         )}
       </ScrollView>
+
+      {/* Floating AI Button */}
+      <FloatingAIButton
+        visible={isFabVisible}
+        onPress={() => navigation.navigate('AIAssistant')}
+      />
     </View>
   );
 };
@@ -225,6 +253,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
+  },
+  navRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  navChip: {
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  navChipText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
   },
   scrollContent: {
     padding: theme.spacing.md,

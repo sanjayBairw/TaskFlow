@@ -2,6 +2,28 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchService = void 0;
 const gemini_1 = require("../config/gemini");
+function safeExtractJson(text) {
+    if (!text)
+        return null;
+    const stripped = text.replace(/```json\n?|\n?```/g, '').trim();
+    try {
+        return JSON.parse(stripped);
+    }
+    catch {
+        const firstBrace = text.indexOf('{');
+        const lastBrace = text.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace > firstBrace) {
+            const candidate = text.substring(firstBrace, lastBrace + 1);
+            try {
+                return JSON.parse(candidate);
+            }
+            catch {
+                return null;
+            }
+        }
+        return null;
+    }
+}
 class SearchService {
     static async searchWeb(query, options = {}) {
         const cleanQuery = (query || '').trim();
@@ -38,14 +60,7 @@ CRITICAL INSTRUCTIONS:
                 },
             });
             const responseText = response.text || '{}';
-            let parsed = {};
-            try {
-                const cleanedText = responseText.replace(/```json\n?|\n?```/g, '').trim();
-                parsed = JSON.parse(cleanedText);
-            }
-            catch {
-                parsed = {};
-            }
+            const parsed = safeExtractJson(responseText) || {};
             const rawResults = parsed.results || [];
             const results = [];
             const seenUrls = new Set();
@@ -73,7 +88,7 @@ CRITICAL INSTRUCTIONS:
             return results.slice(0, 8);
         }
         catch (error) {
-            console.error('[SearchService] Error calling Gemini Search API:', error);
+            console.warn('[SearchService] Error calling Gemini Search API:', error);
             return [];
         }
     }

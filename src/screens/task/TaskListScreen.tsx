@@ -13,11 +13,12 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { Task, TaskStatus, TaskPriority, TaskCategory } from '../../models';
-import { CustomButton, Header, TaskCard } from '../../components';
+import { CustomButton, Header, TaskCard, FloatingAIButton } from '../../components';
 import { theme } from '../../theme';
 import { useAuth } from '../../store';
 import { TaskService } from '../../services/taskService';
 import { TaskListNavProps } from '../../navigation/types';
+import { useScrollFAB } from '../../hooks/useScrollFAB';
 
 export interface TaskListScreenProps extends Partial<TaskListNavProps> {
   onNavigateAddTask?: () => void;
@@ -46,6 +47,7 @@ export const TaskListScreen: React.FC<TaskListScreenProps> = ({
   onNavigateTaskDetail,
   onNavigateAIAssistant,
 }) => {
+  const { isFabVisible, handleScroll } = useScrollFAB();
   const { logout, user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -444,7 +446,9 @@ export const TaskListScreen: React.FC<TaskListScreenProps> = ({
         <FlatList
           data={filteredAndSortedTasks}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingBottom: 100 }]}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
@@ -487,13 +491,10 @@ export const TaskListScreen: React.FC<TaskListScreenProps> = ({
       )}
 
       {/* Floating AI Assistant Action Button */}
-      <TouchableOpacity
-        style={styles.floatingAiButton}
+      <FloatingAIButton
+        visible={isFabVisible}
         onPress={handlePressAIAssistant}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.floatingAiButtonText}>✨ TaskFlow AI</Text>
-      </TouchableOpacity>
+      />
     </View>
   );
 };
