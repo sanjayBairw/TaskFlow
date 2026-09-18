@@ -9,6 +9,7 @@ export type MainStackParamList = {
   TaskList: undefined;
   AddTask: undefined;
   TaskDetail: { taskId: string };
+  AIAssistant: undefined;
 };
 
 export type LoginNavProps = StackScreenProps<AuthStackParamList, 'Login'>;
@@ -17,3 +18,5 @@ export type RegisterNavProps = StackScreenProps<AuthStackParamList, 'Register'>;
 export type TaskListNavProps = StackScreenProps<MainStackParamList, 'TaskList'>;
 export type AddTaskNavProps = StackScreenProps<MainStackParamList, 'AddTask'>;
 export type TaskDetailNavProps = StackScreenProps<MainStackParamList, 'TaskDetail'>;
+export type AIAssistantNavProps = StackScreenProps<MainStackParamList, 'AIAssistant'>;
+

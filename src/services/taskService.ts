@@ -1,5 +1,6 @@
 import { Task, TaskStatus, TaskCategory, CreateTaskDto, UpdateTaskDto } from '../models';
 import { ApiService } from './api';
+import { NotificationService } from './notificationService';
 
 function normalizeTask(rawTask: any): Task {
   if (!rawTask) {
@@ -36,22 +37,37 @@ export class TaskService {
   public static async createTask(taskData: CreateTaskDto): Promise<Task> {
     const res = await ApiService.post<{ task: any }>('/tasks', taskData);
     const rawTask = res?.task || res;
-    return normalizeTask(rawTask);
+    const task = normalizeTask(rawTask);
+    await NotificationService.scheduleTaskReminder(task);
+    return task;
   }
 
   public static async updateTask(id: string, updates: UpdateTaskDto): Promise<Task> {
     const res = await ApiService.put<{ task: any }>(`/tasks/${id}`, updates);
     const rawTask = res?.task || res;
-    return normalizeTask(rawTask);
+    const task = normalizeTask(rawTask);
+    if (task.isCompleted) {
+      await NotificationService.cancelTaskReminder(task.id);
+    } else {
+      await NotificationService.scheduleTaskReminder(task);
+    }
+    return task;
   }
 
   public static async updateTaskStatus(id: string, status: TaskStatus): Promise<Task> {
     const res = await ApiService.patch<{ task: any }>(`/tasks/${id}/status`, { status });
     const rawTask = res?.task || res;
-    return normalizeTask(rawTask);
+    const task = normalizeTask(rawTask);
+    if (status === TaskStatus.COMPLETED) {
+      await NotificationService.cancelTaskReminder(task.id);
+    } else {
+      await NotificationService.scheduleTaskReminder(task);
+    }
+    return task;
   }
 
   public static async deleteTask(id: string): Promise<void> {
     await ApiService.delete<{ message: string }>(`/tasks/${id}`);
+    await NotificationService.cancelTaskReminder(id);
   }
 }

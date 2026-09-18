@@ -67,6 +67,40 @@ const taskSchema = new mongoose_1.Schema({
         type: [String],
         default: [],
     },
+    aiGenerated: {
+        type: Boolean,
+        default: false,
+    },
+    sourceUrl: {
+        type: String,
+        default: '',
+    },
+    reminderEnabled: {
+        type: Boolean,
+        default: true,
+    },
+    reminderMinutesBefore: {
+        type: Number,
+        default: 0,
+    },
+    autoReschedule: {
+        type: String,
+        default: '12 HOURS',
+    },
+    rescheduleCount: {
+        type: Number,
+        default: 0,
+    },
+    originalDateTime: {
+        type: Date,
+    },
+    lastRescheduledAt: {
+        type: Date,
+    },
+    parentTaskId: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'Task',
+    },
 }, {
     timestamps: true,
 });

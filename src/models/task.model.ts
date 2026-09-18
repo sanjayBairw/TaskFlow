@@ -32,6 +32,15 @@ export interface Task {
   category: TaskCategory;
   tags: string[];
   isCompleted: boolean;
+  aiGenerated?: boolean;
+  sourceUrl?: string;
+  reminderEnabled?: boolean;
+  reminderMinutesBefore?: number;
+  autoReschedule?: string;
+  rescheduleCount?: number;
+  originalDateTime?: string;
+  lastRescheduledAt?: string;
+  parentTaskId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -44,6 +53,11 @@ export interface CreateTaskDto {
   priority: TaskPriority;
   category?: TaskCategory;
   tags?: string[];
+  aiGenerated?: boolean;
+  sourceUrl?: string;
+  reminderEnabled?: boolean;
+  reminderMinutesBefore?: number;
+  autoReschedule?: string;
 }
 
 export interface UpdateTaskDto {
@@ -56,4 +70,9 @@ export interface UpdateTaskDto {
   category?: TaskCategory;
   tags?: string[];
   isCompleted?: boolean;
+  aiGenerated?: boolean;
+  sourceUrl?: string;
+  reminderEnabled?: boolean;
+  reminderMinutesBefore?: number;
+  autoReschedule?: string;
 }
