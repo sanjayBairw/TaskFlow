@@ -63,7 +63,6 @@ export const AIAssistantScreen: React.FC<AIAssistantNavProps> = ({ navigation, r
       handleSendMessage(initialPrompt);
     }
   }, [route?.params]);
-
   const handleSendMessage = async (customPrompt?: string) => {
     const promptToSend = (customPrompt || inputText).trim();
     if (!promptToSend || isLoading) return;
