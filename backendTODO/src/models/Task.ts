@@ -31,6 +31,15 @@ export interface ITask extends Document {
   status: TaskStatus;
   category: TaskCategory;
   tags: string[];
+  aiGenerated?: boolean;
+  sourceUrl?: string;
+  reminderEnabled?: boolean;
+  reminderMinutesBefore?: number;
+  autoReschedule?: string;
+  rescheduleCount?: number;
+  originalDateTime?: Date;
+  lastRescheduledAt?: Date;
+  parentTaskId?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -79,6 +88,40 @@ const taskSchema = new Schema<ITask>(
     tags: {
       type: [String],
       default: [],
+    },
+    aiGenerated: {
+      type: Boolean,
+      default: false,
+    },
+    sourceUrl: {
+      type: String,
+      default: '',
+    },
+    reminderEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    reminderMinutesBefore: {
+      type: Number,
+      default: 0,
+    },
+    autoReschedule: {
+      type: String,
+      default: '12 HOURS',
+    },
+    rescheduleCount: {
+      type: Number,
+      default: 0,
+    },
+    originalDateTime: {
+      type: Date,
+    },
+    lastRescheduledAt: {
+      type: Date,
+    },
+    parentTaskId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Task',
     },
   },
   {

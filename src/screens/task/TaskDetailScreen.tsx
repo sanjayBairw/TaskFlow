@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Alert,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { Task, TaskPriority, TaskStatus, TaskCategory } from '../../models';
 import {
@@ -49,6 +50,7 @@ export const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
   const [editPriority, setEditPriority] = useState<TaskPriority>(TaskPriority.MEDIUM);
   const [editStatus, setEditStatus] = useState<TaskStatus>(TaskStatus.PENDING);
   const [editCategory, setEditCategory] = useState<TaskCategory>(TaskCategory.OTHER);
+  const [editReminderMinutesBefore, setEditReminderMinutesBefore] = useState<number>(0);
   const [editTagsInput, setEditTagsInput] = useState('');
 
   const handleBack = () => {
@@ -67,6 +69,7 @@ export const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
     setEditPriority(t.priority);
     setEditStatus(t.status);
     setEditCategory(t.category || TaskCategory.OTHER);
+    setEditReminderMinutesBefore(t.reminderMinutesBefore || 0);
     setEditTagsInput(t.tags ? t.tags.join(', ') : '');
   }, []);
 
@@ -168,6 +171,8 @@ export const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
         status: editStatus,
         category: editCategory,
         tags,
+        reminderMinutesBefore: editReminderMinutesBefore,
+        reminderEnabled: true,
       });
 
       setTask(updated);
@@ -261,6 +266,13 @@ export const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
                     backgroundColor={getStatusColor(task.status) + '20'}
                     textColor={getStatusColor(task.status)}
                   />
+                  {task.aiGenerated && (
+                    <Badge
+                      label="✨ AI Generated"
+                      backgroundColor={theme.colors.primary + '15'}
+                      textColor={theme.colors.primary}
+                    />
+                  )}
                 </View>
 
                 <Text style={styles.title}>{task.title}</Text>
@@ -282,6 +294,35 @@ export const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
                 )}
 
                 <View style={styles.metaDivider} />
+
+                <View style={styles.metaRow}>
+                  <Text style={styles.metaLabel}>🔔 Reminder:</Text>
+                  <Text style={styles.metaValue}>
+                    {task.reminderMinutesBefore === 0
+                      ? 'At task start time'
+                      : `${task.reminderMinutesBefore} minutes before`}
+                  </Text>
+                </View>
+
+                {task.sourceUrl ? (
+                  <View style={styles.metaRow}>
+                    <Text style={styles.metaLabel}>🔗 Source:</Text>
+                    <TouchableOpacity onPress={() => Linking.openURL(task.sourceUrl || '').catch(() => {})}>
+                      <Text style={[styles.metaValue, { color: theme.colors.primary, textDecorationLine: 'underline' }]}>
+                        {task.sourceUrl}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : null}
+
+                {task.rescheduleCount && task.rescheduleCount > 0 ? (
+                  <View style={styles.metaRow}>
+                    <Text style={styles.metaLabel}>🔄 Rescheduled:</Text>
+                    <Text style={styles.metaValue}>
+                      {task.rescheduleCount} times
+                    </Text>
+                  </View>
+                ) : null}
 
                 <View style={styles.metaRow}>
                   <Text style={styles.metaLabel}>Deadline State:</Text>
@@ -427,6 +468,37 @@ export const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
                           ]}
                         >
                           {st}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+
+                <View style={styles.chipSection}>
+                  <Text style={styles.sectionLabel}>🔔 Reminder Timing</Text>
+                  <View style={styles.chipRow}>
+                    {[
+                      { label: 'At task time', value: 0 },
+                      { label: '5m before', value: 5 },
+                      { label: '15m before', value: 15 },
+                      { label: '30m before', value: 30 },
+                      { label: '1h before', value: 60 },
+                    ].map((rem) => (
+                      <TouchableOpacity
+                        key={`rem-${rem.value}`}
+                        style={[
+                          styles.chip,
+                          editReminderMinutesBefore === rem.value && styles.chipSelected,
+                        ]}
+                        onPress={() => setEditReminderMinutesBefore(rem.value)}
+                      >
+                        <Text
+                          style={[
+                            styles.chipText,
+                            editReminderMinutesBefore === rem.value && styles.chipTextSelected,
+                          ]}
+                        >
+                          {rem.label}
                         </Text>
                       </TouchableOpacity>
                     ))}

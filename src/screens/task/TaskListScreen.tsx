@@ -22,6 +22,7 @@ import { TaskListNavProps } from '../../navigation/types';
 export interface TaskListScreenProps extends Partial<TaskListNavProps> {
   onNavigateAddTask?: () => void;
   onNavigateTaskDetail?: (taskId: string) => void;
+  onNavigateAIAssistant?: () => void;
 }
 
 type SortOption =
@@ -43,6 +44,7 @@ export const TaskListScreen: React.FC<TaskListScreenProps> = ({
   navigation,
   onNavigateAddTask,
   onNavigateTaskDetail,
+  onNavigateAIAssistant,
 }) => {
   const { logout, user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -144,6 +146,14 @@ export const TaskListScreen: React.FC<TaskListScreenProps> = ({
       navigation.navigate('TaskDetail', { taskId: id });
     } else if (onNavigateTaskDetail) {
       onNavigateTaskDetail(id);
+    }
+  };
+
+  const handlePressAIAssistant = () => {
+    if (navigation) {
+      navigation.navigate('AIAssistant');
+    } else if (onNavigateAIAssistant) {
+      onNavigateAIAssistant();
     }
   };
 
@@ -252,6 +262,11 @@ export const TaskListScreen: React.FC<TaskListScreenProps> = ({
         subtitle={greetingSubtitle}
         rightAction={
           <View style={styles.headerActions}>
+            <CustomButton
+              title="✨ AI"
+              size="sm"
+              onPress={handlePressAIAssistant}
+            />
             <CustomButton
               title="+ New"
               size="sm"
@@ -470,6 +485,15 @@ export const TaskListScreen: React.FC<TaskListScreenProps> = ({
           )}
         />
       )}
+
+      {/* Floating AI Assistant Action Button */}
+      <TouchableOpacity
+        style={styles.floatingAiButton}
+        onPress={handlePressAIAssistant}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.floatingAiButtonText}>✨ TaskFlow AI</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -478,6 +502,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+  floatingAiButton: {
+    position: 'absolute',
+    bottom: theme.spacing.lg,
+    right: theme.spacing.md,
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm + 2,
+    borderRadius: theme.spacing.borderRadius.full,
+    elevation: 5,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+  },
+  floatingAiButtonText: {
+    color: '#FFF',
+    fontSize: theme.typography.sizes.sm,
+    fontWeight: theme.typography.weights.bold,
   },
   headerActions: {
     flexDirection: 'row',

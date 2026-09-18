@@ -26,6 +26,7 @@ export const AddTaskScreen: React.FC<AddTaskScreenProps> = ({
   const [deadline, setDeadline] = useState(defaultDeadline);
   const [priority, setPriority] = useState<TaskPriority>(TaskPriority.MEDIUM);
   const [category, setCategory] = useState<TaskCategory>(TaskCategory.PERSONAL);
+  const [reminderMinutesBefore, setReminderMinutesBefore] = useState<number>(0);
   const [tagsInput, setTagsInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -91,6 +92,8 @@ export const AddTaskScreen: React.FC<AddTaskScreenProps> = ({
         priority,
         category,
         tags,
+        reminderMinutesBefore,
+        reminderEnabled: true,
       });
 
       Alert.alert('Success', 'Task created successfully', [
@@ -201,6 +204,37 @@ export const AddTaskScreen: React.FC<AddTaskScreenProps> = ({
                     ]}
                   >
                     {option.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.chipSection}>
+            <Text style={styles.sectionLabel}>🔔 Reminder Timing *</Text>
+            <View style={styles.chipRow}>
+              {[
+                { label: 'At task time', value: 0 },
+                { label: '5m before', value: 5 },
+                { label: '15m before', value: 15 },
+                { label: '30m before', value: 30 },
+                { label: '1h before', value: 60 },
+              ].map((rem) => (
+                <TouchableOpacity
+                  key={`rem-${rem.value}`}
+                  style={[
+                    styles.chip,
+                    reminderMinutesBefore === rem.value && styles.chipSelected,
+                  ]}
+                  onPress={() => setReminderMinutesBefore(rem.value)}
+                >
+                  <Text
+                    style={[
+                      styles.chipText,
+                      reminderMinutesBefore === rem.value && styles.chipTextSelected,
+                    ]}
+                  >
+                    {rem.label}
                   </Text>
                 </TouchableOpacity>
               ))}
