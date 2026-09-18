@@ -494,6 +494,7 @@ export const TaskListScreen: React.FC<TaskListScreenProps> = ({
       <FloatingAIButton
         visible={isFabVisible}
         onPress={handlePressAIAssistant}
+        onSendVoicePrompt={(promptText) => navigation?.navigate('AIAssistant', { initialPrompt: promptText })}
       />
     </View>
   );

@@ -292,6 +292,7 @@ export const PlannerScreen: React.FC<PlannerTabNavProps> = ({ navigation }) => {
       <FloatingAIButton
         visible={isFabVisible}
         onPress={() => navigation.navigate('AIAssistant')}
+        onSendVoicePrompt={(promptText) => navigation.navigate('AIAssistant', { initialPrompt: promptText })}
       />
     </View>
   );

@@ -54,9 +54,16 @@ export class ApiService {
       try {
         data = responseText ? JSON.parse(responseText) : {};
       } catch {
+        const errorDetail =
+          response.status === 404
+            ? 'API endpoint not found on server (404)'
+            : response.status >= 500
+            ? `Server error status (${response.status})`
+            : `Server returned non-JSON response (${response.status})`;
+
         data = {
           success: false,
-          message: 'Invalid response format from server',
+          message: errorDetail,
         } as ApiResponse<T>;
       }
 

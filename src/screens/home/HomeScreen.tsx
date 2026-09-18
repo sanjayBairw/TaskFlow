@@ -244,6 +244,7 @@ export const HomeScreen: React.FC<HomeTabNavProps> = ({ navigation }) => {
       <FloatingAIButton
         visible={isFabVisible}
         onPress={() => navigation.navigate('AIAssistant')}
+        onSendVoicePrompt={(promptText) => navigation.navigate('AIAssistant', { initialPrompt: promptText })}
       />
     </View>
   );
