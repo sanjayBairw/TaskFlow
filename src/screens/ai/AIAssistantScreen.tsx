@@ -43,7 +43,7 @@ const SUGGESTED_COMMANDS = [
   'Move unfinished tasks to tomorrow.',
 ];
 
-export const AIAssistantScreen: React.FC<AIAssistantNavProps> = ({ navigation }) => {
+export const AIAssistantScreen: React.FC<AIAssistantNavProps> = ({ navigation, route }) => {
   const [inputText, setInputText] = useState('');
   const [activeConversationId, setActiveConversationId] = useState<string | undefined>(undefined);
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -56,6 +56,13 @@ export const AIAssistantScreen: React.FC<AIAssistantNavProps> = ({ navigation })
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStepText, setLoadingStepText] = useState('🧠 Understanding your request...');
+
+  React.useEffect(() => {
+    const initialPrompt = (route?.params as any)?.initialPrompt;
+    if (initialPrompt) {
+      handleSendMessage(initialPrompt);
+    }
+  }, [route?.params]);
 
   const handleSendMessage = async (customPrompt?: string) => {
     const promptToSend = (customPrompt || inputText).trim();
